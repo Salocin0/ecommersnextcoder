@@ -1,5 +1,10 @@
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { config } from "@fortawesome/fontawesome-svg-core";
+config.autoAddCss = false;
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Header from "./Componentes/Header";
+import Footer from "./Componentes/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -10,8 +15,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" className="h-screen">
+      <body className="flex flex-col h-screen">
+        <Header />
+        <main className="flex-grow">{children}</main>
+        <Footer />
+      </body>
     </html>
   );
 }
