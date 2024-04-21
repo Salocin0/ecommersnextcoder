@@ -1,12 +1,13 @@
 import React from "react";
-import productsData from "../../data/data.json";
 import ProductCard from "./ProductCard";
+import { getProducts } from "./GetProducts";
 
-const ProductList = ({ categoria }) => {
-  let filteredProducts = productsData;
+const ProductList = async ({ categoria }) => {
+  const products = await getProducts();
+  let filteredProducts = products;
 
   if (categoria) {
-    filteredProducts = productsData.filter(
+    filteredProducts = products.filter(
       (product) => product.category === categoria
     );
   }

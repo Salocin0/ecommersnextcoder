@@ -1,6 +1,9 @@
-import React from 'react';
+"use client"
+import React,{useContext} from 'react';
+import { UseContext } from './UseContext';
 
-const BotoneraProducto = ({ cantidad, restarCantidad, sumarCantidad }) => {
+const BotoneraProducto = () => {
+  const { cantidad, sumarCantidad, restarCantidad } = useContext(UseContext);
   return (
     <div className="flex items-center justify-center mb-4">
       <button

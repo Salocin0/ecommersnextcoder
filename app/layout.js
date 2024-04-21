@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "./Componentes/Header";
 import Footer from "./Componentes/Footer";
+import { MyProvider } from "./Componentes/UseContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,10 +17,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="h-screen">
-      <body className="flex flex-col h-screen">
-        <Header />
-        <main className="flex-grow">{children}</main>
-        <Footer />
+      <body className="flex flex-col h-screen vsc-initialized">
+        <MyProvider>
+          <Header />
+          <main className="flex-grow">
+            <div className="container mx-auto">{children}</div>
+          </main>
+          <Footer />
+        </MyProvider>
       </body>
     </html>
   );
