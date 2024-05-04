@@ -36,7 +36,7 @@ const CarritoPage = () => {
               key={item.product.id}
               producto={item.product}
               cantidad={item.quantity}
-              subtotal={item.quantity * item.product.price}
+              subtotal={item?.quantity * item.product?.price}
               onSumarCantidad={() => addToCartQuantity(item.product, 1)}
               onRestarCantidad={() => addToCartQuantity(item.product, -1)}
               onEliminarItem={() => removeFromCart(item.product)}

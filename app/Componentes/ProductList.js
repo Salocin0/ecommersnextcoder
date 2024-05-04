@@ -8,8 +8,10 @@ const ProductList = async ({ categoria }) => {
 
   if (categoria) {
     filteredProducts = products.filter(
-      (product) => product.category === categoria
+      (product) => product.category === categoria && product.stock > 0
     );
+  } else {
+    filteredProducts = products.filter((product) => product.stock > 0);
   }
 
   return (

@@ -1,9 +1,8 @@
-"use client";
+"use client"
 import React, { createContext, useEffect, useState } from "react";
-import { checkUserIdAndUpdateCart } from "./GetSavedCart";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "../firebase/config";
-import { getDoc,setDoc,doc } from "firebase/firestore";
+import { getDoc, setDoc, doc, writeBatch, collection, query, where, getDocs } from "firebase/firestore";
 
 const UseContext = createContext();
 
@@ -11,19 +10,24 @@ const MyProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [cantidad, setCantidad] = useState(1);
+  let accessToken = null;
+
+  const getCantidad = () => {
+    return cantidad
+  };
 
   useEffect(() => {
-    const idusuario=localStorage.getItem("userId");
+    const idusuario = localStorage.getItem("userId");
     if (idusuario) {
       const docRef = doc(db, "Carritos", idusuario);
-        const carritoPromise = getDoc(docRef);
-        carritoPromise.then((snapshot) => {
-          const carritoData = snapshot.data();
-          if (carritoData) {
-            setCart(carritoData.productos);
-            setTotalItems(calculateTotalItems(carritoData.productos));
-          }
-        })
+      const carritoPromise = getDoc(docRef);
+      carritoPromise.then((snapshot) => {
+        const carritoData = snapshot.data();
+        if (carritoData) {
+          setCart(carritoData.productos);
+          setTotalItems(calculateTotalItems(carritoData.productos));
+        }
+      });
     } else {
       console.log("No se encontró ningún userID en el localStorage");
       const newUserId = uuidv4();
@@ -32,13 +36,15 @@ const MyProvider = ({ children }) => {
   }, []);
 
   const guardarCarrito = async (userID, carrito) => {
+    console.log("userid", userID)
+    console.log("carrito", carrito)
     const docRef = doc(db, "Carritos", userID);
-    await setDoc(docRef, { productos: carrito })
+    await setDoc(docRef, { productos: carrito });
   };
 
   const guardarPedidos = async (userID, carrito, datosUsuarios) => {
-    const docRef = doc(db, "Pedidos", userID+Date.now());
-    await setDoc(docRef, { productos: carrito,Comprador:datosUsuarios })
+    const docRef = doc(db, "Pedidos", userID + Date.now());
+    await setDoc(docRef, { productos: carrito, Comprador: datosUsuarios });
   };
 
   const addToCart = (product) => {
@@ -67,12 +73,12 @@ const MyProvider = ({ children }) => {
     guardarCarrito(localStorage.getItem("userId"), updatedCart);
   };
 
-  const addToCartQuantity = (product, quantity) => {
+  const addToCartQuantity = (product, quantity=cantidad) => {
     const updatedCart = [...cart];
     const existingItem = updatedCart.find(
       (item) => item.product.id === product.id
     );
-
+    console.log("existe",existingItem)
     if (existingItem) {
       existingItem.quantity += quantity;
       if (existingItem.quantity <= 0) {
@@ -120,7 +126,7 @@ const MyProvider = ({ children }) => {
     }
     return total;
   };
-  
+
   const vaciarCarrito = () => {
     setCart([]);
     setTotalItems(0);
@@ -128,9 +134,57 @@ const MyProvider = ({ children }) => {
   };
 
   const comprarCarrito = async (inputs) => {
-    await guardarPedidos(localStorage.getItem("userId"), cart, inputs)
+    await guardarPedidos(localStorage.getItem("userId"), cart, inputs);
+    restarStockProductos(cart);
     vaciarCarrito();
-    
+  };
+
+  const restarStockProductos = async (carrito) => {
+    const batch = writeBatch(db);
+  
+    try {
+      for (const item of carrito) {
+        const productId = item.product.id;
+        const q = query(collection(db, "Productos"), where("id", "==", productId));
+        const querySnapshot = await getDocs(q);
+  
+        if (!querySnapshot.empty) {
+          const productDoc = querySnapshot.docs[0];
+          const productRef = doc(db, "Productos", productDoc.id);
+          const currentStock = productDoc.data().stock;
+          const updatedStock = currentStock - item.quantity;
+  
+          batch.update(productRef, { stock: updatedStock });
+        } else {
+          console.error("No se encontró el producto con ID:", productId);
+        }
+      }
+  
+      await batch.commit();
+      console.log("Stock de productos actualizado correctamente.");
+    } catch (error) {
+      console.error("Error actualizando el stock de productos:", error);
+    }
+  };
+  
+  const getAccessToken = () => {
+    const result = localStorage.getItem("accessToken");
+    if (result) {
+      return result;
+    }
+    if (accessToken) {
+      return accessToken;
+    }
+  };
+
+  const deleteAccessToken = () => {
+    localStorage.setItem("accessToken", null);
+    accessToken = null;
+  };
+
+  const setAccessToken = (token) => {
+    localStorage.setItem("accessToken", token);
+    accessToken = token;
   };
 
   return (
@@ -146,6 +200,10 @@ const MyProvider = ({ children }) => {
         addToCartQuantity,
         calcularTotalCarrito,
         comprarCarrito,
+        getAccessToken,
+        deleteAccessToken,
+        setAccessToken,
+        getCantidad
       }}
     >
       {children}

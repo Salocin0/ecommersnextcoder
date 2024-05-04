@@ -71,7 +71,7 @@ const FormCompra = () => {
       toast.success("Compra realizada con éxito", {position: "bottom-right",theme: "dark"})
       setTimeout(() => {
         router.push("/"); 
-      }, 1500);
+      }, 2000);
     }
   };
 
