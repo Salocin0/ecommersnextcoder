@@ -169,12 +169,13 @@ const MyProvider = ({ children }) => {
   
   const getAccessToken = () => {
     const result = localStorage.getItem("accessToken");
-    if (result) {
-      return result;
-    }
     if (accessToken) {
       return accessToken;
     }
+    if (result) {
+      return result;
+    }
+    return undefined
   };
 
   const deleteAccessToken = () => {
