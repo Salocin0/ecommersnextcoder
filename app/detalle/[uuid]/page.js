@@ -9,7 +9,7 @@ const DetalleProductoPage = async ({ params }) => {
   const producto = await getProductById(id);
 
   if (!producto) {
-    return <div>Producto no encontrado</div>;
+    throw new Error();
   }
 
   const { title, image, price, description, stock=0 } = producto;
