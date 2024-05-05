@@ -11,14 +11,19 @@ function Page() {
   const [password, setPassword] = useState("");
   const auth = getAuth(app);
   const router = useRouter();
-  const { setAccessToken,getAccessToken } = useContext(UseContext);
+  const { setAccessToken,getAccessToken,deleteAccessToken } = useContext(UseContext);
 
   useEffect(() => {
     const token = getAccessToken()
-    if(token || token!=="null"){
+    console.log(token)
+    if(token!=="null"){
+      if(token ==undefined){
+        deleteAccessToken()
+      }else{
         router.push("/admin/productos");
+      }
     }
-  }, [getAccessToken,router]);
+  }, [getAccessToken,router,deleteAccessToken]);
 
 
   const handleEmailChange = (e) => {

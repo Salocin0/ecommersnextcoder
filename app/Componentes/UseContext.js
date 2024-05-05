@@ -166,27 +166,27 @@ const MyProvider = ({ children }) => {
       console.error("Error actualizando el stock de productos:", error);
     }
   };
-  
+
   const getAccessToken = () => {
-    const result = localStorage.getItem("accessToken");
+    const result = sessionStorage.getItem("accessToken");
     if (accessToken) {
       return accessToken;
     }
     if (result) {
       return result;
     }
-    return undefined
   };
-
+  
   const deleteAccessToken = () => {
-    localStorage.setItem("accessToken", null);
+    sessionStorage.setItem("accessToken", null);
     accessToken = null;
   };
-
+  
   const setAccessToken = (token) => {
-    localStorage.setItem("accessToken", token);
+    sessionStorage.setItem("accessToken", token);
     accessToken = token;
   };
+  
 
   return (
     <UseContext.Provider

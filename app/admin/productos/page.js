@@ -18,9 +18,9 @@ const Page = () => {
 
   useEffect(() => {
     const token = getAccessToken()
-    if (token || token!=="null"){
-        router.push("/admin");
-    }
+    if(token=="null" || !token){
+      router.push("/admin");
+  }
 
     const fetchData = async () => {
       const fetchedProducts = await getProducts();
