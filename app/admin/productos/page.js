@@ -18,7 +18,7 @@ const Page = () => {
 
   useEffect(() => {
     const token = getAccessToken()
-    if (token == "null"){
+    if (token || token!=="null"){
         router.push("/admin");
     }
 
